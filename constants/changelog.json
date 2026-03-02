@@ -1,0 +1,29 @@
+[
+  {
+    "version": "v0.3",
+    "isCurrent": true,
+    "changes": [
+      "Implementação de Consultas Avançadas.",
+      "Correções de layout e responsividade."
+    ]
+  },
+  {
+    "version": "v0.2",
+    "isCurrent": false,
+    "changes": [
+      "Otimização UI/UX (Botões, Toast, Animações).",
+      "Melhorias no modo de Inventário e Lote.",
+      "Correções de layout e responsividade."
+    ]
+  },
+  {
+    "version": "v0.1",
+    "isCurrent": false,
+    "changes": [
+      "Lançamento Inicial.",
+      "Movimentos de Entrada e Saída.",
+      "Integração com Google Sheets (GAS).",
+      "Consulta de Sets com leitor de código de barras."
+    ]
+  }
+]
