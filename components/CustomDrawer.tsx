@@ -18,7 +18,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { GOOGLE_WEB_CLIENT_ID } from "../config/constants";
 import Theme from "../constants";
 import changelog from "../constants/changelog.json";
 import { useAuth } from "../context/AuthContext";
@@ -36,7 +35,7 @@ export default function CustomDrawerContent(props: any) {
 
   useEffect(() => {
     GoogleSignin.configure({
-      webClientId: GOOGLE_WEB_CLIENT_ID,
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       offlineAccess: true,
     });
   }, []);

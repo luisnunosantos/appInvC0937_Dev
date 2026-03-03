@@ -22,7 +22,6 @@ import {
   View,
 } from "react-native";
 import Toast from "react-native-toast-message";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants"; // Importação do Design System
 import { useAuth } from "../../context/AuthContext";
 import { getLegoSetByCode } from "../../services/database";
@@ -132,7 +131,7 @@ export default function ModoLoteScreen() {
     setLoading(true);
 
     try {
-      console.log("A enviar para:", GOOGLE_SCRIPT_URL);
+      console.log("A enviar para:", process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL);
 
       const payload = {
         action: "BATCH_MOVEMENT",
@@ -148,7 +147,7 @@ export default function ModoLoteScreen() {
         })),
       };
 
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

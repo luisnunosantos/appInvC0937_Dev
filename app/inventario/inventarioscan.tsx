@@ -15,7 +15,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import KeyButton from "../../components/KeyButton"; // <-- Importado o nosso botão oficial
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 import { getLegoSetByCode } from "../../services/database";
@@ -166,7 +165,7 @@ export default function InventoryScanScreen() {
                 items: payloadItems,
               };
 
-              const response = await fetch(GOOGLE_SCRIPT_URL, {
+              const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(payload),

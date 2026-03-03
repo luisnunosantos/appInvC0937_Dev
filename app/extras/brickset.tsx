@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import KeyButton from "../../components/KeyButton";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 
@@ -58,7 +57,7 @@ export default function BricksetUpdateScreen() {
     try {
       // 4. URL COM O USER EMAIL
       const response = await fetch(
-        `${GOOGLE_SCRIPT_URL}?action=updateBrickset&user=${encodeURIComponent(user.email)}`,
+        `${process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL}?action=updateBrickset&user=${encodeURIComponent(user.email)}`,
       );
       const result = await response.json();
 

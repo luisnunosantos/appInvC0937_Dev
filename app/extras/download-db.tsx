@@ -13,7 +13,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import KeyButton from "../../components/KeyButton";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 import { syncLocalDatabase } from "../../services/database";
@@ -54,7 +53,7 @@ export default function DownloadDbScreen() {
     setSetsCount(null);
 
     try {
-      const urlWithUser = `${GOOGLE_SCRIPT_URL}?action=sync&user=${encodeURIComponent(user.email)}`;
+      const urlWithUser = `${process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL}?action=sync&user=${encodeURIComponent(user.email)}`;
 
       const response = await fetch(urlWithUser);
 

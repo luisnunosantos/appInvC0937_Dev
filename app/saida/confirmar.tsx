@@ -21,7 +21,6 @@ import FadeInView from "../../components/FadeInView";
 import KeyButton from "../../components/KeyButton";
 import SetCard from "../../components/SetCard";
 import SkeletonSetCard from "../../components/SkeletonSetCard"; // <-- Importado
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 
@@ -62,7 +61,7 @@ export default function SaidaConfirmarScreen() {
         setIsValidatingStock(true);
         try {
           const response = await fetch(
-            `${GOOGLE_SCRIPT_URL}?action=getStock&setId=${set_id}`,
+            `${process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL}?action=getStock&setId=${set_id}`,
           );
 
           if (response.ok) {
@@ -159,7 +158,7 @@ export default function SaidaConfirmarScreen() {
         user: user.email,
       };
 
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(dadosParaGuardar),
       });

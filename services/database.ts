@@ -128,20 +128,17 @@ export const getUniqueSubthemes = (theme?: string): string[] => {
 /**
  * Faz o pedido ao Backend (Google Apps Script) para pesquisar os movimentos.
  */
-export const performAdvancedSearch = async (
-  scriptUrl: string,
-  filters: {
-    theme?: string;
-    subtheme?: string;
-    origin?: string;
-    destination?: string;
-    dateMode?: "IN" | "OUT"; // NOVO: Tipo de movimento
-    dateStart?: string; // NOVO: Data de Início
-    dateEnd?: string; // NOVO: Data de Fim
-  },
-) => {
+export const performAdvancedSearch = async (filters: {
+  theme?: string;
+  subtheme?: string;
+  origin?: string;
+  destination?: string;
+  dateMode?: "IN" | "OUT"; // NOVO: Tipo de movimento
+  dateStart?: string; // NOVO: Data de Início
+  dateEnd?: string; // NOVO: Data de Fim
+}) => {
   try {
-    const response = await fetch(scriptUrl, {
+    const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

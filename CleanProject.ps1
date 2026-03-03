@@ -106,25 +106,44 @@ function Kill-Processes {
 }
 
 # -----------------------------
+# ASK BUILD
+# -----------------------------
+function Ask-Build {
+    Write-Host ""
+    $answer = Read-Host "Deseja compilar agora? (s/n)"
+    if ($answer -eq "s") {
+        Run-Android
+    } else {
+        Write-Host "A voltar ao menu..." -ForegroundColor Yellow
+    }
+}
+
+# -----------------------------
 # CLEAN LEVELS
 # -----------------------------
 function Light-Clean {
     Write-Host "`n===== LIMPEZA LEVE =====" -ForegroundColor Green
     npx expo start -c
+
     if (Test-Path "android") {
         Push-Location android
         ./gradlew clean
         Pop-Location
     }
+
+    Ask-Build
 }
 
 function Medium-Clean {
     Write-Host "`n===== LIMPEZA MEDIA =====" -ForegroundColor Green
+
     if (Test-Path "android") {
         Remove-Item android -Recurse -Force
     }
+
     npx expo prebuild
-    npx expo run:android
+
+    Ask-Build
 }
 
 function Nuclear-Clean {
@@ -134,12 +153,10 @@ function Nuclear-Clean {
     gradle --stop 2>$null
 
     if (Test-Path "node_modules") {
-        Write-Host "Removing node_modules..."
         Remove-Item node_modules -Recurse -Force
     }
 
     if (Test-Path "android") {
-        Write-Host "Removing android folder..."
         Remove-Item android -Recurse -Force
     }
 
@@ -157,9 +174,8 @@ function Nuclear-Clean {
 
     Invoke-Expression $InstallCmd
     npx expo prebuild
-    npx expo run:android
 
-    Write-Host "`nFULL EXTREME RESET COMPLETED!" -ForegroundColor Green
+    Ask-Build
 }
 
 function Run-Android {
@@ -209,9 +225,9 @@ while ($true) {
         "5" { EAS-Build }
         "6" { Environment-Diagnosis }
         "7" { 
-    Write-Host "`nA sair do DevTool..." -ForegroundColor Yellow
-    exit 
-}
+            Write-Host "`nA sair do DevTool..." -ForegroundColor Yellow
+            exit 
+        }
         default { Write-Host "Opcao invalida" -ForegroundColor Red }
     }
 }

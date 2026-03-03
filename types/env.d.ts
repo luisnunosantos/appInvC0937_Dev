@@ -1,12 +1,9 @@
-// custom typings so that TypeScript knows about env variables
-import "expo";
+// types/env.d.ts
 
-declare module "expo" {
-  interface ExpoConfig {
-    extra?: {
-      API_URL?: string;
-      GOOGLE_SCRIPT_URL?: string;
-      [key: string]: any;
-    };
+declare namespace NodeJS {
+  interface ProcessEnv {
+    EXPO_PUBLIC_GOOGLE_SCRIPT_URL: string;
+    EXPO_PUBLIC_API_URL: string;
+    EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: string;
   }
 }

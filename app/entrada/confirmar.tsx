@@ -16,7 +16,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import KeyButton from "../../components/KeyButton";
 import SetCard from "../../components/SetCard";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 import { SessionStore } from "../../services/session";
@@ -95,7 +94,7 @@ export default function EntradaConfirmarScreen() {
         user: user.email,
       };
 
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
         method: "POST",
         body: JSON.stringify(dadosParaGuardar),
       });

@@ -21,7 +21,6 @@ import Toast from "react-native-toast-message";
 
 // Nossos Componentes e Constantes
 import KeyButton from "../../components/KeyButton";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import {
   getUniqueSubthemes,
@@ -71,7 +70,7 @@ export default function ConsultasAvancadas() {
     setResults([]);
 
     try {
-      const response = await performAdvancedSearch(GOOGLE_SCRIPT_URL, {
+      const response = await performAdvancedSearch({
         theme,
         subtheme,
         origin,

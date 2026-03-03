@@ -14,7 +14,6 @@ import {
 } from "react-native";
 import Toast from "react-native-toast-message";
 import KeyButton from "../../components/KeyButton";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 
 export default function InventoryListScreen() {
@@ -32,7 +31,7 @@ export default function InventoryListScreen() {
 
   const fetchSheets = async () => {
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "listInventorySheets" }),
@@ -71,7 +70,7 @@ export default function InventoryListScreen() {
 
     setIsCreating(true);
     try {
-      const response = await fetch(GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "createInventorySheet" }),

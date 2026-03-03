@@ -13,7 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import SetCard from "../../components/SetCard";
 import SkeletonSetCard from "../../components/SkeletonSetCard";
-import { GOOGLE_SCRIPT_URL } from "../../config/constants";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 
@@ -45,7 +44,7 @@ export default function DetalhesScreen() {
         const userEmail = user?.email || "visitante";
 
         const response = await fetch(
-          `${GOOGLE_SCRIPT_URL}?action=getStock&setId=${localData.number}&user=${encodeURIComponent(userEmail)}`,
+          `${process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL}?action=getStock&setId=${localData.number}&user=${encodeURIComponent(userEmail)}`,
         );
         const cloudInfo = await response.json();
 
