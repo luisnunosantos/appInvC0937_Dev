@@ -20,11 +20,8 @@ export const setupDatabase = () => {
 };
 
 export const syncLocalDatabase = async (data: any[]) => {
-  // 1. Limpar dados antigos
   db.execSync("DELETE FROM lego_sets");
 
-  // 2. ALTERAÇÃO AQUI: Usamos "INSERT OR REPLACE" em vez de só "INSERT"
-  // Isto resolve o erro se houver sets repetidos no Excel
   const statement = db.prepareSync(
     "INSERT OR REPLACE INTO lego_sets (number, name, year, theme, subtheme, ean) VALUES (?, ?, ?, ?, ?, ?)",
   );
@@ -80,9 +77,9 @@ export const getLegoSetByCode = (code: string): any | null => {
   }
 };
 
-// ============================================
-// NOVAS FUNÇÕES: CONSULTAS AVANÇADAS E FILTROS
-// ============================================
+// =============================
+// CONSULTAS AVANÇADAS E FILTROS
+// =============================
 
 /**
  * Retorna uma lista de Temas (Themes) únicos da base de dados local
@@ -156,21 +153,3 @@ export const performAdvancedSearch = async (filters: {
     throw error;
   }
 };
-
-// export const searchLocalSet = (query: string) => {
-//   const cleanQuery = query.trim();
-
-//   // 1. Tenta procurar pelo Número do Set
-//   let result = db.getFirstSync("SELECT * FROM lego_sets WHERE number = ?", [
-//     cleanQuery,
-//   ]);
-
-//   // 2. Se não encontrou, tenta pelo EAN (Código de Barras)
-//   if (!result) {
-//     result = db.getFirstSync("SELECT * FROM lego_sets WHERE ean = ?", [
-//       cleanQuery,
-//     ]);
-//   }
-
-//   return result;
-// };
