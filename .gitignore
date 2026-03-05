@@ -43,3 +43,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# cleaning tools
+.bat
+.ps1
