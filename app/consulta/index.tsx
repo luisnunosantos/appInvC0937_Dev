@@ -15,12 +15,23 @@ import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 import { searchLocalSet } from "../../services/database";
 
+// 1. Tipagem Estrita adicionada
+interface LocalLegoSet {
+  number: string | number;
+  name: string;
+  year: number;
+  theme: string;
+  subtheme: string;
+  image_url?: string;
+  ean?: string | number;
+}
+
 export default function ConsultaIndexScreen() {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState<string>("");
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const { code: scannedCode } = useLocalSearchParams();
-  const { user } = useAuth(); // Mantemos o hook, mas não bloqueamos se for null
+  const [loading, setLoading] = useState<boolean>(false);
+  const { code: scannedCode } = useLocalSearchParams<{ code: string }>();
+  const { user } = useAuth();
 
   useFocusEffect(
     useCallback(() => {
@@ -33,10 +44,12 @@ export default function ConsultaIndexScreen() {
     async (searchCode: string) => {
       if (!searchCode || searchCode.trim() === "") return;
 
-      setLoading(true); // Ativa o loading visual
+      setLoading(true);
       try {
-        // 1. Apenas verificamos se existe na base de dados local
-        const localData: any = await searchLocalSet(searchCode);
+        // 2. Remoção do "any" e uso da interface
+        const localData = (await searchLocalSet(
+          searchCode,
+        )) as LocalLegoSet | null;
 
         if (!localData) {
           Toast.show({
@@ -50,7 +63,6 @@ export default function ConsultaIndexScreen() {
         }
 
         setLoading(false);
-        // 2. NAVEGAÇÃO IMEDIATA!
         router.push({
           pathname: "/consulta/detalhes",
           params: {
@@ -68,7 +80,7 @@ export default function ConsultaIndexScreen() {
         });
       }
     },
-    [router, user],
+    [router], // Removido 'user' das dependências se não é usado aqui dentro
   );
 
   const handleNumberPress = (num: string) => {

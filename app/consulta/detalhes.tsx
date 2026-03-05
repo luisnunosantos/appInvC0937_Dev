@@ -16,13 +16,70 @@ import SkeletonSetCard from "../../components/SkeletonSetCard";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 
+// 1. Definição de Tipos Estritos
+interface HistoryItem {
+  tipo: string;
+  data: string;
+  qtd: number;
+  storage: string;
+}
+
+interface SetInfo {
+  set_id: string | number;
+  name: string;
+  year: number;
+  theme: string;
+  subtheme: string;
+  image_url?: string;
+  location: string;
+  history: HistoryItem[];
+  stock: number;
+}
+
+// 2. Componente de Skeleton fora da função principal para evitar re-renders desnecessários
+const SkeletonLine = ({ style }: { style?: any }) => {
+  const opacity = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(opacity, {
+          toValue: 0.7,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacity, {
+          toValue: 0.3,
+          duration: 800,
+          useNativeDriver: true,
+        }),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [opacity]);
+
+  return (
+    <Animated.View
+      style={[
+        {
+          backgroundColor: Theme.colors.light.border,
+          borderRadius: Theme.metrics.radius.small,
+        },
+        style,
+        { opacity },
+      ]}
+    />
+  );
+};
+
 export default function DetalhesScreen() {
   const params = useLocalSearchParams();
   const router = useRouter();
   const { user } = useAuth();
 
-  const [loading, setLoading] = useState(true);
-  const [setInfo, setSetInfo] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [setInfo, setSetInfo] = useState<SetInfo | null>(null);
 
   const localData = useMemo(() => {
     return params.baseData ? JSON.parse(params.baseData as string) : null;
@@ -67,7 +124,7 @@ export default function DetalhesScreen() {
           return;
         }
 
-        let formattedHistory = [];
+        let formattedHistory: HistoryItem[] = [];
         if (hasHistory) {
           formattedHistory = rawHistory.map((mov: any) => {
             const dateIn = mov.Date_IN || mov.date_in;
@@ -95,7 +152,7 @@ export default function DetalhesScreen() {
           });
         }
 
-        const fullData = {
+        const fullData: SetInfo = {
           set_id: localData.number,
           name: localData.name,
           year: localData.year,
@@ -116,7 +173,7 @@ export default function DetalhesScreen() {
         Toast.show({
           type: "error",
           text1: "Erro de Ligação",
-          text2: "Não foi possível validar o inventário.",
+          text2: "Não foi possível validar o inventário na nuvem.",
           position: "top",
         });
         setTimeout(() => router.back(), 2000);
@@ -124,46 +181,13 @@ export default function DetalhesScreen() {
     }
 
     fetchData();
-  }, [localData, user]);
-
-  const SkeletonLine = ({ style }: { style?: any }) => {
-    const opacity = useRef(new Animated.Value(0.3)).current;
-    useEffect(() => {
-      const loop = Animated.loop(
-        Animated.sequence([
-          Animated.timing(opacity, {
-            toValue: 0.7,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(opacity, {
-            toValue: 0.3,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-        ]),
-      );
-      loop.start();
-      return () => loop.stop();
-    }, []);
-    return (
-      <Animated.View
-        style={[
-          {
-            backgroundColor: Theme.colors.light.border,
-            borderRadius: Theme.metrics.radius.small,
-          },
-          style,
-          { opacity },
-        ]}
-      />
-    );
-  };
+  }, [localData, user, isStale, router]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return "-";
-    const d = new Date(dateString);
-    if (isNaN(d.getTime())) return dateString.substring(0, 10);
+    const normalizedDateString = dateString.replace(" ", "T");
+    const d = new Date(normalizedDateString);
+    if (isNaN(d.getTime())) return dateString.substring(0, 16);
     return (
       d.toLocaleDateString("pt-PT") +
       " " +
@@ -178,7 +202,7 @@ export default function DetalhesScreen() {
       setInfo.history.length > 0
     ) {
       const lastMove = setInfo.history.find(
-        (m: any) => m.storage && m.storage.trim() !== "" && m.storage !== "-",
+        (m) => m.storage && m.storage.trim() !== "" && m.storage !== "-",
       );
       if (lastMove) return lastMove.storage;
     }
@@ -189,6 +213,7 @@ export default function DetalhesScreen() {
     return "Sem localização registada";
   };
 
+  // Ecrã de Loading com Skeletons
   if (loading || !setInfo || isStale) {
     return (
       <SafeAreaView
@@ -225,30 +250,17 @@ export default function DetalhesScreen() {
                 marginTop: Theme.metrics.spacing.medium,
               }}
             />
-            <SkeletonLine
-              style={{
-                width: "100%",
-                height: 70,
-                marginBottom: Theme.metrics.spacing.small,
-                borderRadius: Theme.metrics.radius.large,
-              }}
-            />
-            <SkeletonLine
-              style={{
-                width: "100%",
-                height: 70,
-                marginBottom: Theme.metrics.spacing.small,
-                borderRadius: Theme.metrics.radius.large,
-              }}
-            />
-            <SkeletonLine
-              style={{
-                width: "100%",
-                height: 70,
-                marginBottom: Theme.metrics.spacing.small,
-                borderRadius: Theme.metrics.radius.large,
-              }}
-            />
+            {[1, 2, 3].map((key) => (
+              <SkeletonLine
+                key={key}
+                style={{
+                  width: "100%",
+                  height: 70,
+                  marginBottom: Theme.metrics.spacing.small,
+                  borderRadius: Theme.metrics.radius.large,
+                }}
+              />
+            ))}
           </View>
         </View>
       </SafeAreaView>
@@ -260,6 +272,7 @@ export default function DetalhesScreen() {
     ? String(setInfo.image_url)
     : `https://images.brickset.com/sets/images/${setInfo.set_id}-1.jpg`;
 
+  // Renderização principal do Ecrã de Detalhes
   return (
     <SafeAreaView style={styles.container} edges={["bottom", "left", "right"]}>
       <View style={styles.contentAdjusted}>
@@ -366,7 +379,7 @@ export default function DetalhesScreen() {
       </View>
     </SafeAreaView>
   );
-}
+} // <- ESTA ERA A CHAVETA QUE FALTAVA!
 
 const styles = StyleSheet.create({
   container: {
