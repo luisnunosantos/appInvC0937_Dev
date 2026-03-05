@@ -55,13 +55,13 @@ export default function ConsultasAvancadas() {
   const [availableSubthemes, setAvailableSubthemes] = useState<string[]>([]);
 
   useEffect(() => {
-    const loadThemes = async () => setAvailableThemes(getUniqueThemes());
+    const loadThemes = async () => setAvailableThemes(await getUniqueThemes());
     loadThemes();
   }, []);
 
   useEffect(() => {
     const loadSubthemes = async () =>
-      setAvailableSubthemes(getUniqueSubthemes(theme));
+      setAvailableSubthemes(await getUniqueSubthemes(theme));
     loadSubthemes();
   }, [theme]);
 
@@ -198,7 +198,8 @@ export default function ConsultasAvancadas() {
               >
                 <Text style={styles.suggestionText}>{opt}</Text>
                 <Ionicons
-                  name="arrow-up-left"
+                  //name="arrow-up-left"
+                  name="arrow-up-left-box-outline"
                   size={16}
                   color={Theme.colors.light.textSecondary}
                 />

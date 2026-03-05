@@ -2,12 +2,30 @@
 
 import * as SQLite from "expo-sqlite";
 
-// Abrir a base de dados (será criada se não existir)
-const db = SQLite.openDatabaseSync("lego_inventory.db");
+// Define an interface for the Lego set data structure
+interface LegoSet {
+  n: string | number;
+  s: string;
+  y: number;
+  t: string;
+  st: string;
+  e: string | number;
+}
 
-export const setupDatabase = () => {
-  // Criar a tabela local para guardar os 22.000 sets
-  db.execSync(`
+let db: SQLite.Database | null = null;
+
+// Lazily open the database connection.
+const getDb = async (): Promise<SQLite.Database> => {
+  if (db === null) {
+    db = await SQLite.openDatabaseAsync("lego_inventory.db");
+  }
+  return db;
+};
+
+export const setupDatabase = async () => {
+  const db = await getDb();
+  // Create the table for Lego sets if it doesn't exist.
+  await db.execAsync(`
     CREATE TABLE IF NOT EXISTS lego_sets (
       number TEXT PRIMARY KEY,
       name TEXT,
@@ -19,54 +37,59 @@ export const setupDatabase = () => {
   `);
 };
 
-export const syncLocalDatabase = async (data: any[]) => {
-  db.execSync("DELETE FROM lego_sets");
-
-  const statement = db.prepareSync(
-    "INSERT OR REPLACE INTO lego_sets (number, name, year, theme, subtheme, ean) VALUES (?, ?, ?, ?, ?, ?)",
-  );
-
+export const syncLocalDatabase = async (data: LegoSet[]) => {
+  const db = await getDb();
   try {
-    db.execSync("BEGIN TRANSACTION");
+    // Use a transaction to perform the batch insert efficiently.
+    await db.withTransactionAsync(async () => {
+      // Clear the existing data.
+      await db.runAsync("DELETE FROM lego_sets");
 
-    for (const item of data) {
-      // Pequena validação para garantir que não tentamos gravar linhas vazias
-      if (item.n) {
-        statement.executeSync([
-          String(item.n),
-          String(item.s),
-          Number(item.y),
-          String(item.t),
-          String(item.st),
-          String(item.e),
-        ]);
+      // Prepare the insert statement once.
+      const statement = await db.prepareAsync(
+        "INSERT OR REPLACE INTO lego_sets (number, name, year, theme, subtheme, ean) VALUES (?, ?, ?, ?, ?, ?)",
+      );
+
+      // Iterate over the data and execute the prepared statement.
+      for (const item of data) {
+        // Basic validation to avoid inserting empty rows.
+        if (item.n) {
+          await statement.executeAsync([
+            String(item.n),
+            String(item.s),
+            Number(item.y),
+            String(item.t),
+            String(item.st),
+            String(item.e),
+          ]);
+        }
       }
-    }
 
-    db.execSync("COMMIT");
+      // Finalize the statement after the loop.
+      await statement.finalizeAsync();
+    });
     console.log("Sincronização SQLite concluída com sucesso.");
   } catch (error) {
-    db.execSync("ROLLBACK");
     console.error("Erro na transação de sincronização:", error);
     throw error;
-  } finally {
-    statement.finalizeSync();
   }
 };
 
-export const searchLocalSet = (query: string) => {
+export const searchLocalSet = async (query: string) => {
+  const db = await getDb();
   const cleanQuery = query.trim();
-  return db.getFirstSync(
+  return await db.getFirstAsync<LegoSet>(
     "SELECT * FROM lego_sets WHERE number = ? OR ean = ?",
     [cleanQuery, cleanQuery],
   );
 };
 
-export const getLegoSetByCode = (code: string): any | null => {
+export const getLegoSetByCode = async (
+  code: string,
+): Promise<LegoSet | null> => {
+  const db = await getDb();
   try {
-    // Tenta encontrar pelo EAN (código de barras) ou pelo número do set
-    // O LIKE ajuda caso o leitor apanhe um zero à esquerda ou direita extra
-    const result = db.getFirstSync(
+    const result = await db.getFirstAsync<LegoSet>(
       `SELECT * FROM lego_sets WHERE ean LIKE ? OR number = ?`,
       [`%${code}%`, code],
     );
@@ -85,11 +108,12 @@ export const getLegoSetByCode = (code: string): any | null => {
  * Retorna uma lista de Temas (Themes) únicos da base de dados local
  * Ideal para preencher a Dropdown de pesquisa.
  */
-export const getUniqueThemes = (): string[] => {
+export const getUniqueThemes = async (): Promise<string[]> => {
+  const db = await getDb();
   try {
-    const results = db.getAllSync(
+    const results = await db.getAllAsync<{ theme: string }>(
       "SELECT DISTINCT theme FROM lego_sets WHERE theme IS NOT NULL AND theme != '' ORDER BY theme ASC",
-    ) as { theme: string }[];
+    );
     return results.map((r) => r.theme);
   } catch (error) {
     console.error("Erro ao buscar temas únicos:", error);
@@ -101,7 +125,8 @@ export const getUniqueThemes = (): string[] => {
  * Retorna uma lista de Subtemas únicos da base de dados local.
  * Se passarmos um 'theme', ele filtra apenas os subtemas desse tema!
  */
-export const getUniqueSubthemes = (theme?: string): string[] => {
+export const getUniqueSubthemes = async (theme?: string): Promise<string[]> => {
+  const db = await getDb();
   try {
     let query =
       "SELECT DISTINCT subtheme FROM lego_sets WHERE subtheme IS NOT NULL AND subtheme != ''";
@@ -114,7 +139,7 @@ export const getUniqueSubthemes = (theme?: string): string[] => {
 
     query += " ORDER BY subtheme ASC";
 
-    const results = db.getAllSync(query, params) as { subtheme: string }[];
+    const results = await db.getAllAsync<{ subtheme: string }>(query, params);
     return results.map((r) => r.subtheme);
   } catch (error) {
     console.error("Erro ao buscar subtemas únicos:", error);
