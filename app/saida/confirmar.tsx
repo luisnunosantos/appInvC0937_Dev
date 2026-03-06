@@ -17,10 +17,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
-import FadeInView from "../../components/FadeInView";
 import KeyButton from "../../components/KeyButton";
 import SetCard from "../../components/SetCard";
-import SkeletonSetCard from "../../components/SkeletonSetCard"; // <-- Importado
+import SkeletonSetCard from "../../components/SkeletonSetCard";
 import Theme from "../../constants";
 import { useAuth } from "../../context/AuthContext";
 
@@ -50,7 +49,10 @@ export default function SaidaConfirmarScreen() {
   const [currentStock, setCurrentStock] = useState<number | null>(null);
   const [isValidatingStock, setIsValidatingStock] = useState(true);
 
-  // Carregamento do Stock via Google assim que enta no ecrã
+  // Estado Derivado: Valida em tempo real se a quantidade excede o stock
+  const isExceeding = currentStock !== null && qtd > currentStock;
+
+  // Carregamento do Stock via Google assim que entra no ecrã
   useFocusEffect(
     useCallback(() => {
       setSaving(false);
@@ -107,7 +109,8 @@ export default function SaidaConfirmarScreen() {
     destination !== "" && !standardOptions.includes(destination);
 
   const handleFinalizar = async () => {
-    if (currentStock !== null && qtd > currentStock) {
+    // Dupla validação por segurança
+    if (isExceeding) {
       Toast.show({
         type: "error",
         text1: "Stock Insuficiente",
@@ -158,7 +161,7 @@ export default function SaidaConfirmarScreen() {
         user: user.email,
       };
 
-      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL, {
+      const response = await fetch(process.env.EXPO_PUBLIC_GOOGLE_SCRIPT_URL!, {
         method: "POST",
         body: JSON.stringify(dadosParaGuardar),
       });
@@ -188,7 +191,7 @@ export default function SaidaConfirmarScreen() {
     setModalVisible(false);
   };
 
-  // Ecrã Skeleton enquanto validade o Stock
+  // Ecrã Skeleton enquanto valida o Stock
   if (isValidatingStock) {
     return (
       <SafeAreaView
@@ -249,42 +252,61 @@ export default function SaidaConfirmarScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          <FadeInView>
-            <SetCard
-              setId={set_id as string}
-              name={name as string}
-              theme={theme as string}
-              subtheme={subtemaFinal}
-              year={year as string}
-              imageUrl={bricksetImageUrl}
-              currentStock={currentStock}
-              loadingStock={false}
-            >
-              <View style={styles.qtyPill}>
-                <TouchableOpacity
-                  onPress={() => setQtd(Math.max(1, qtd - 1))}
-                  style={styles.qtyBtn}
-                >
-                  <Ionicons
-                    name="remove"
-                    size={20}
-                    color={Theme.colors.light.textSecondary}
-                  />
-                </TouchableOpacity>
-                <Text style={styles.qtyText}>{qtd}</Text>
-                <TouchableOpacity
-                  onPress={() => setQtd(qtd + 1)}
-                  style={styles.qtyBtn}
-                >
-                  <Ionicons
-                    name="add"
-                    size={20}
-                    color={Theme.colors.light.textSecondary}
-                  />
-                </TouchableOpacity>
-              </View>
-            </SetCard>
-          </FadeInView>
+          <SetCard
+            setId={set_id as string}
+            name={name as string}
+            theme={theme as string}
+            subtheme={subtemaFinal}
+            year={year as string}
+            imageUrl={bricksetImageUrl}
+            currentStock={currentStock}
+            loadingStock={false}
+          >
+            <View style={styles.qtyPill}>
+              <TouchableOpacity
+                onPress={() => setQtd(Math.max(1, qtd - 1))}
+                style={styles.qtyBtn}
+              >
+                <Ionicons
+                  name="remove"
+                  size={20}
+                  color={Theme.colors.light.textSecondary}
+                />
+              </TouchableOpacity>
+              <Text
+                style={[
+                  styles.qtyText,
+                  isExceeding && { color: Theme.colors.light.error },
+                ]}
+              >
+                {qtd}
+              </Text>
+              <TouchableOpacity
+                onPress={() => setQtd(qtd + 1)}
+                style={styles.qtyBtn}
+              >
+                <Ionicons
+                  name="add"
+                  size={20}
+                  color={Theme.colors.light.textSecondary}
+                />
+              </TouchableOpacity>
+            </View>
+          </SetCard>
+
+          {/* Aviso Dinâmico caso a quantidade selecionada exceda o stock */}
+          {isExceeding && (
+            <View style={styles.warningContainer}>
+              <Ionicons
+                name="warning"
+                size={16}
+                color={Theme.colors.light.error}
+              />
+              <Text style={styles.warningText}>
+                A quantidade excede o stock atual (Máx: {currentStock})
+              </Text>
+            </View>
+          )}
 
           <Text style={styles.label}>Destino :</Text>
           <View style={styles.chipsContainer}>
@@ -332,13 +354,15 @@ export default function SaidaConfirmarScreen() {
             value={obs}
             onChangeText={setObs}
           />
+
           <KeyButton
             title={saving ? "A Guardar..." : "Confirmar Saída"}
             onPress={handleFinalizar}
             loading={saving}
             loadingText="A GUARDAR..."
             style={{ marginTop: Theme.metrics.spacing.large }}
-            type="primary"
+            type={isExceeding ? "secondary" : "primary"}
+            disabled={saving || isExceeding} // Desativa o botão se exceder stock
           />
         </ScrollView>
       </KeyboardAvoidingView>
@@ -494,5 +518,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: Theme.metrics.spacing.medium,
     color: Theme.colors.light.text,
+  },
+  warningContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: Theme.metrics.spacing.small,
+    backgroundColor: "#ffe6e6",
+    padding: 8,
+    borderRadius: Theme.metrics.radius.small,
+  },
+  warningText: {
+    color: Theme.colors.light.error,
+    fontSize: 13,
+    fontWeight: "600",
+    marginLeft: 6,
   },
 });
