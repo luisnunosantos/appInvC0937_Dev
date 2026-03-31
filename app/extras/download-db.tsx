@@ -227,7 +227,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: Theme.metrics.spacing.small,
   },
-  logo: { width: 100, height: 100 },
+  logo: { width: 250, height: 250 },
   title: {
     fontSize: 26,
     fontWeight: "bold",
