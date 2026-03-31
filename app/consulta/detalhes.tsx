@@ -298,7 +298,7 @@ export default function DetalhesScreen() {
               name="location-outline"
               size={18}
               color={Theme.colors.light.text}
-              style={{ marginRight: 5, marginTop: 15 }}
+              style={{ marginRight: 5, marginTop: 20 }}
             />
             <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>
               Localização Atual
@@ -321,7 +321,7 @@ export default function DetalhesScreen() {
               name="time-outline"
               size={18}
               color={Theme.colors.light.text}
-              style={{ marginRight: 5, marginTop: 15 }}
+              style={{ marginRight: 5, marginTop: 20 }}
             />
             <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>
               Movimentos

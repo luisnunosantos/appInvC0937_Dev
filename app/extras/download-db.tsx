@@ -118,8 +118,8 @@ export default function DownloadDbScreen() {
 
           <Text style={styles.title}>Modo Offline</Text>
           <Text style={styles.description}>
-            Transfere todos os sets para o teu telemóvel para poderes pesquisar
-            sem internet.
+            Transfere os dados para o teu telemóvel para poderes utilizar sem
+            internet.
           </Text>
         </View>
 
@@ -189,7 +189,7 @@ export default function DownloadDbScreen() {
             icon={
               !loading ? (
                 <Ionicons
-                  name="download-outline"
+                  name="cloud-download-outline"
                   size={Theme.metrics.icon.base}
                   color={Theme.colors.light.text}
                 />
@@ -227,20 +227,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginBottom: Theme.metrics.spacing.small,
   },
-  logo: { width: 250, height: 250 },
+  logo: {
+    width: "90%",
+    height: "100%",
+  },
   title: {
     fontSize: 26,
     fontWeight: "bold",
     color: Theme.colors.light.text,
-    marginTop: 5,
+    marginTop: Theme.metrics.spacing.small,
   },
   description: {
     textAlign: "center",
     color: Theme.colors.light.textSecondary,
     marginTop: 5,
     fontSize: 14,
-    paddingHorizontal: Theme.metrics.spacing.small,
+    paddingHorizontal: Theme.metrics.spacing.medium,
   },
+
+  // --- SECÇÃO CENTRAL ---
   centerSection: {
     flex: 1,
     justifyContent: "center",
@@ -270,14 +275,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   statusValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginTop: 5,
     textAlign: "center",
   },
   countText: {
     marginTop: Theme.metrics.spacing.small,
-    fontSize: 14,
+    fontSize: 16,
     color: Theme.colors.light.text,
     fontWeight: "600",
     backgroundColor: Theme.colors.light.cardBackground,
@@ -299,6 +304,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 14,
   },
+
   bottomSection: {
     marginBottom: Theme.metrics.spacing.small,
   },

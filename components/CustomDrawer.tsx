@@ -142,10 +142,10 @@ export default function CustomDrawerContent(props: any) {
             <Ionicons
               name="cloud-download-outline"
               size={22}
-              color={user ? "#2196F3" : Theme.colors.light.textSecondary}
+              color={user ? "#4CAF50" : Theme.colors.light.textSecondary}
             />
             <Text style={[styles.menuText, !user && styles.disabledText]}>
-              Offline - Transferir Base de Dados
+              Google Sheets - Modo Offline
             </Text>
           </TouchableOpacity>
 
@@ -156,14 +156,10 @@ export default function CustomDrawerContent(props: any) {
             <Ionicons
               name="refresh-circle-outline"
               size={22}
-              color={
-                user
-                  ? Theme.colors.light.success
-                  : Theme.colors.light.textSecondary
-              }
+              color={user ? "#2196F3" : Theme.colors.light.textSecondary}
             />
             <Text style={[styles.menuText, !user && styles.disabledText]}>
-              Atualizar Catálogos de Sets
+              Brickset - Atualizar Catálogo
             </Text>
           </TouchableOpacity>
 
@@ -203,7 +199,7 @@ export default function CustomDrawerContent(props: any) {
 
           <TouchableOpacity style={styles.menuItem} onPress={handleSendLogs}>
             <Ionicons name="bug-outline" size={22} color="#f0ad4e" />
-            <Text style={styles.menuText}>Reportar Problema (Logs)</Text>
+            <Text style={styles.menuText}>Reportar Bug (Logs)</Text>
           </TouchableOpacity>
 
           <View style={{ flex: 1 }} />
@@ -310,7 +306,7 @@ export default function CustomDrawerContent(props: any) {
 
             <View style={styles.modalFooter}>
               <Ionicons
-                name="cube-outline"
+                name="shield-checkmark-outline"
                 size={20}
                 color={Theme.colors.primary}
                 style={{ marginRight: 6 }}

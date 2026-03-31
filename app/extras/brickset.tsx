@@ -114,7 +114,7 @@ export default function BricksetUpdateScreen() {
 
           <Text style={styles.title}>Atualizar Catálogo</Text>
           <Text style={styles.description}>
-            Sincronização direta com a base de dados oficial do Brickset.
+            Vai verificar se existem novos sets na base de dados do Brickset.
           </Text>
         </View>
 
@@ -183,7 +183,7 @@ export default function BricksetUpdateScreen() {
             icon={
               !loading ? (
                 <Ionicons
-                  name="cloud-upload"
+                  name="refresh-circle-outline"
                   size={Theme.metrics.icon.base}
                   color={Theme.colors.light.text}
                 />
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     marginTop: Theme.metrics.spacing.medium,
   },
   imageContainer: {
-    height: 140,
+    height: 100,
     width: "100%",
     alignItems: "center",
     justifyContent: "center",

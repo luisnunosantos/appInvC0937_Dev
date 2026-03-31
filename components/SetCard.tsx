@@ -66,8 +66,8 @@ export default function SetCard({
         ) : (
           <>
             <Ionicons
-              name={hasStock ? "cube" : "cube-outline"}
-              size={12}
+              name={hasStock ? "copy-outline" : "copy-outline"}
+              size={16}
               color={badgeText}
             />
             <Text style={[styles.stockBadgeText, { color: badgeText }]}>
